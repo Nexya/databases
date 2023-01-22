@@ -1,2 +1,2 @@
 # TDA357 Databases
-Exercises and assignments for CTH course 
+Assignments for CTH course 
