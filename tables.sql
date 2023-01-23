@@ -4,10 +4,10 @@ TODO:   add foreign keys for references and other tables
 */
 
 CREATE TABLE Students(
-    idnr        TEXT PRIMARY KEY,
-    name        TEXT,
-    login       TEXT UNIQUE,
-    program     TEXT
+    idnr        TEXT NOT NULL PRIMARY KEY,
+    name        TEXT NOT NULL,
+    login       TEXT NOT NULL UNIQUE,
+    program     TEXT NOT NULL
 );
 
 CREATE TABLE Branches(
