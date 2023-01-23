@@ -24,7 +24,7 @@ SET client_min_messages TO NOTICE; -- More talk
 -- Tests various queries from the assignment, uncomment these as you make progress
 SELECT idnr, name, login, program, branch FROM BasicInformation ORDER BY idnr;
 
---SELECT student, course, grade, credits FROM FinishedCourses ORDER BY student;
+SELECT student, course, grade, credits FROM FinishedCourses ORDER BY student;
 
 --SELECT student, course, credits FROM PassedCourses ORDER BY student;
 
