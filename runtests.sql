@@ -26,7 +26,7 @@ SELECT idnr, name, login, program, branch FROM BasicInformation ORDER BY idnr;
 
 SELECT student, course, grade, credits FROM FinishedCourses ORDER BY student;
 
---SELECT student, course, credits FROM PassedCourses ORDER BY student;
+SELECT student, course, credits FROM PassedCourses ORDER BY student;
 
 --SELECT student, course, status FROM Registrations ORDER BY student;
 
