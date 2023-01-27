@@ -1,6 +1,5 @@
 /* 
-TODO:   add foreign keys for references and other tables
-        add constraints
+TODO:   add constraints
 */
 
 CREATE TABLE Students(
