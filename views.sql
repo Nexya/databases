@@ -12,5 +12,10 @@ FROM Students;
 -- FinishedCourses(student, course, grade, credits)
 CREATE VIEW FinishedCourses AS
 SELECT Taken.student, Taken.course, Taken.grade,
-(SELECT credits FROM Courses WHERE Taken.course = Courses.code) -- TODO: fix round error?
+(SELECT credits FROM Courses WHERE Taken.course = Courses.code)
 FROM Taken;
+
+--PassedCourses(student, course, credits)
+CREATE VIEW PassedCourses AS
+SELECT * FROM FinishedCourses WHERE NOT grade = 'U';
+
