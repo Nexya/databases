@@ -26,3 +26,18 @@ UNION
 SELECT Registered.student, Registered.course, 'registered' AS status FROM Registered;
 
 
+--UnreadMandatory(student, course)
+CREATE VIEW UnreadMandatory AS
+-- table of all courses from mandatory program
+SELECT  Students.idnr AS student, MandatoryProgram.course 
+FROM Students, MandatoryProgram
+WHERE Students.program = MandatoryProgram.program
+UNION
+-- table of all courses from mandatory branch
+SELECT StudentBranches.student, MandatoryBranch.course
+FROM StudentBranches, MandatoryBranch
+WHERE StudentBranches.branch = MandatoryBranch.branch
+EXCEPT
+-- delete taken courses
+SELECT Taken.student, Taken.course FROM Taken;
+
