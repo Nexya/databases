@@ -37,15 +37,40 @@ UNION
 -- table of all courses from mandatory branch
 SELECT StudentBranches.student, MandatoryBranch.course
 FROM StudentBranches, MandatoryBranch
-WHERE StudentBranches.branch = MandatoryBranch.branch
+WHERE StudentBranches.program = MandatoryBranch.program
 EXCEPT
 -- delete taken courses
-SELECT Taken.student, Taken.course FROM Taken;
+SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
 
 
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
---CREATE VIEW PathToGraduation AS
+CREATE VIEW PathToGraduation AS
 
---SELECT Students.idnr AS student FROM Students
+WITH path AS 
+(SELECT (SELECT Students.idnr FROM Students) AS student,
 
---SELECT PassedCourses.credits AS totalCredits FROM PassedCourses
+(SELECT PassedCourses.credits FROM PassedCourses) AS totalCredits ,
+
+(SELECT Courses.code
+FROM Courses 
+EXCEPT
+SELECT PassedCourses.course FROM PassedCourses) AS mandatoryLeft,
+
+(WITH mathCourses AS 
+(SELECT course,credits FROM Classified, Courses WHERE classifications = 'math')
+SELECT SUM(credits) AS mathCredits FROM mathCourses),
+
+(WITH researchCourses AS 
+(SELECT course,credits FROM Classified, Courses WHERE classifications = 'research')
+SELECT SUM(credits) AS researchCredits FROM researchCourses),
+
+(SELECT COUNT(course) FROM PassedCourses
+WHERE course IN (Select course FROM Classified 
+WHERE classifications = 'seminar')) AS seminarCourses,
+
+'yes' AS qualified
+)
+
+
+
+SELECT * FROM path;
