@@ -26,6 +26,7 @@ UNION
 SELECT Registered.student, Registered.course, 'registered' AS status FROM Registered;
 
 
+--TODO: NEEDS FIX
 --UnreadMandatory(student, course)
 CREATE VIEW UnreadMandatory AS
 -- table of all courses from mandatory program
@@ -41,3 +42,10 @@ EXCEPT
 -- delete taken courses
 SELECT Taken.student, Taken.course FROM Taken;
 
+
+-- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
+--CREATE VIEW PathToGraduation AS
+
+--SELECT Students.idnr AS student FROM Students
+
+--SELECT PassedCourses.credits AS totalCredits FROM PassedCourses
