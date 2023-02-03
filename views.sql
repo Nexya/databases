@@ -66,11 +66,28 @@ RIGHT JOIN (
     SELECT UnreadMandatory.student, COUNT(UnreadMandatory.course) AS mandatoryLeft
     FROM UnreadMandatory
     GROUP BY UnreadMandatory.student
-) mandatoryLeft ON Students.idnr = mandatoryLeft.student;
+) mandatoryLeft ON Students.idnr = mandatoryLeft.student
 
 -- mathCredits
 RIGHT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS mathCredits
     FROM PassedCourses
-    WHERE 
-)
+    -- TODO: WHERE classified = math
+    GROUP BY PassedCourses.student
+) mathCredits ON Students.idnr = mathCredits.student
+
+-- researchCredits
+RIGHT JOIN(
+    SELECT PassedCourses.student, SUM(PassedCourses.credits) AS researchCredits
+    FROM PassedCourses
+    -- TODO: WHERE classified = research
+    GROUP BY PassedCourses.student
+) researchCredits ON Students.idnr = researchCredits.student
+
+-- seminarCourses
+RIGHT JOIN(
+    SELECT PassedCourses.student, SUM(PassedCourses.credits) AS seminarCourses -- SUM needed? 
+    FROM PassedCourses
+    -- TODO: WHERE classified = seminar
+    GROUP BY PassedCourses.student
+) seminarCourses ON Students.idnr = seminarCourses.student;
