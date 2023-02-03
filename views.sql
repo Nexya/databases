@@ -45,7 +45,7 @@ SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
 CREATE VIEW PathToGraduation AS
 SELECT 
-    Students.name                   AS student,
+    Students.idnr                   AS student,
     COALESCE(totalCredits,0)        AS totalCredits,
     COALESCE(mandatoryLeft,0)       AS mandatoryLeft,
     COALESCE(mathCredits,0)         AS mathCredits,
@@ -55,21 +55,21 @@ SELECT
 FROM Students
 
 -- totalCredits
-RIGHT JOIN (
+FULL OUTER JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS totalCredits
     FROM PassedCourses
     GROUP BY PassedCourses.student
 ) totalCredits ON Students.idnr = totalCredits.student
 
 -- mandatoryLefts
-RIGHT JOIN (
+FULL OUTER JOIN (
     SELECT UnreadMandatory.student, COUNT(UnreadMandatory.course) AS mandatoryLeft
     FROM UnreadMandatory
     GROUP BY UnreadMandatory.student
 ) mandatoryLeft ON Students.idnr = mandatoryLeft.student
 
 -- mathCredits
-RIGHT JOIN (
+FULL OUTER JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS mathCredits
     FROM PassedCourses
     -- TODO: WHERE classified = math
@@ -77,7 +77,7 @@ RIGHT JOIN (
 ) mathCredits ON Students.idnr = mathCredits.student
 
 -- researchCredits
-RIGHT JOIN(
+FULL OUTER JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS researchCredits
     FROM PassedCourses
     -- TODO: WHERE classified = research
@@ -85,7 +85,7 @@ RIGHT JOIN(
 ) researchCredits ON Students.idnr = researchCredits.student
 
 -- seminarCourses
-RIGHT JOIN(
+FULL OUTER JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS seminarCourses -- SUM needed? 
     FROM PassedCourses
     -- TODO: WHERE classified = seminar
