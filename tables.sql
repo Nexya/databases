@@ -21,9 +21,9 @@ CREATE TABLE Courses(
     name        CHAR(2),
     credits     FLOAT,
     department  TEXT NOT NULL,
-    CONSTRAINT positive_credit CHECK(credits>0),
+    CONSTRAINT positive_credit        CHECK(credits>0),
     CONSTRAINT valid_code_name_format CHECK(code LIKE 'CCC%'),
-    CONSTRAINT valid_name_format CHECK(name LIKE 'C_')
+    CONSTRAINT valid_name_format      CHECK(name LIKE 'C_')
 );
 
 CREATE TABLE LimitedCourses(
@@ -81,7 +81,7 @@ CREATE TABLE Registered(
     course      TEXT,
     PRIMARY KEY (student, course),
     FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (course) REFERENCES Courses
+    FOREIGN KEY (course)  REFERENCES Courses
 );
 
 CREATE TABLE Taken(
@@ -91,7 +91,7 @@ CREATE TABLE Taken(
     CONSTRAINT valid_grade CHECK(grade IN ('U','3','4','5')),
     PRIMARY KEY (student, course),
     FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (course) REFERENCES Courses
+    FOREIGN KEY (course)  REFERENCES Courses
 );
 
 CREATE TABLE WaitingList(
@@ -100,5 +100,5 @@ CREATE TABLE WaitingList(
     position    SERIAL,
     PRIMARY KEY (student, course),
     FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (course) REFERENCES LimitedCourses
+    FOREIGN KEY (course)  REFERENCES LimitedCourses
 );

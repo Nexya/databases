@@ -1,7 +1,3 @@
-/*
-TODO:   implement views
-*/
-
 
 -- BasicInformation(idnr, name, login, program, branch)
 CREATE VIEW BasicInformation AS 
@@ -42,6 +38,10 @@ EXCEPT
 SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
 
 
+--Qualified(student, status) 
+--CREATE VIEW Qualified AS 
+
+
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
 CREATE VIEW PathToGraduation AS
 SELECT 
@@ -55,39 +55,39 @@ SELECT
 FROM Students
 
 -- totalCredits
-FULL OUTER JOIN (
+LEFT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS totalCredits
     FROM PassedCourses
     GROUP BY PassedCourses.student
 ) totalCredits ON Students.idnr = totalCredits.student
 
 -- mandatoryLefts
-FULL OUTER JOIN (
+LEFT JOIN (
     SELECT UnreadMandatory.student, COUNT(UnreadMandatory.course) AS mandatoryLeft
     FROM UnreadMandatory
     GROUP BY UnreadMandatory.student
 ) mandatoryLeft ON Students.idnr = mandatoryLeft.student
 
 -- mathCredits
-FULL OUTER JOIN (
+LEFT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS mathCredits
     FROM PassedCourses
-    -- TODO: WHERE classified = math
+    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classifications = 'math')
     GROUP BY PassedCourses.student
 ) mathCredits ON Students.idnr = mathCredits.student
 
 -- researchCredits
-FULL OUTER JOIN (
+LEFT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS researchCredits
     FROM PassedCourses
-    -- TODO: WHERE classified = research
+    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classifications = 'research')
     GROUP BY PassedCourses.student
 ) researchCredits ON Students.idnr = researchCredits.student
 
 -- seminarCourses
-FULL OUTER JOIN (
-    SELECT PassedCourses.student, SUM(PassedCourses.credits) AS seminarCourses -- SUM needed? 
+LEFT JOIN (
+    SELECT PassedCourses.student, COUNT(PassedCourses.course) AS seminarCourses
     FROM PassedCourses
-    -- TODO: WHERE classified = seminar
+    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classifications = 'seminar')
     GROUP BY PassedCourses.student
 ) seminarCourses ON Students.idnr = seminarCourses.student;
