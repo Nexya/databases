@@ -26,7 +26,6 @@ UNION
 SELECT Registered.student, Registered.course, 'registered' AS status FROM Registered;
 
 
---TODO: NEEDS FIX
 --UnreadMandatory(student, course)
 CREATE VIEW UnreadMandatory AS
 -- table of all courses from mandatory program
@@ -45,32 +44,33 @@ SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
 
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
 CREATE VIEW PathToGraduation AS
+SELECT 
+    Students.name                   AS student,
+    COALESCE(totalCredits,0)        AS totalCredits,
+    COALESCE(mandatoryLeft,0)       AS mandatoryLeft,
+    COALESCE(mathCredits,0)         AS mathCredits,
+    COALESCE(researchCredits, 0)    AS researchCredits,
+    COALESCE(seminarCourses,0)      AS seminarCourses,
+    'Placeholder'                   AS qualified
+FROM Students
 
-WITH path AS 
-(SELECT (SELECT Students.idnr FROM Students) AS student,
+-- totalCredits
+RIGHT JOIN (
+    SELECT PassedCourses.student, SUM(PassedCourses.credits) AS totalCredits
+    FROM PassedCourses
+    GROUP BY PassedCourses.student
+) totalCredits ON Students.idnr = totalCredits.student
 
-(SELECT PassedCourses.credits FROM PassedCourses) AS totalCredits ,
+-- mandatoryLefts
+RIGHT JOIN (
+    SELECT UnreadMandatory.student, COUNT(UnreadMandatory.course) AS mandatoryLeft
+    FROM UnreadMandatory
+    GROUP BY UnreadMandatory.student
+) mandatoryLeft ON Students.idnr = mandatoryLeft.student;
 
-(SELECT Courses.code
-FROM Courses 
-EXCEPT
-SELECT PassedCourses.course FROM PassedCourses) AS mandatoryLeft,
-
-(WITH mathCourses AS 
-(SELECT course,credits FROM Classified, Courses WHERE classifications = 'math')
-SELECT SUM(credits) AS mathCredits FROM mathCourses),
-
-(WITH researchCourses AS 
-(SELECT course,credits FROM Classified, Courses WHERE classifications = 'research')
-SELECT SUM(credits) AS researchCredits FROM researchCourses),
-
-(SELECT COUNT(course) FROM PassedCourses
-WHERE course IN (Select course FROM Classified 
-WHERE classifications = 'seminar')) AS seminarCourses,
-
-'yes' AS qualified
+-- mathCredits
+RIGHT JOIN (
+    SELECT PassedCourses.student, SUM(PassedCourses.credits) AS mathCredits
+    FROM PassedCourses
+    WHERE 
 )
-
-
-
-SELECT * FROM path;
