@@ -1,6 +1,3 @@
-/* 
-TODO:   add constraints
-*/
 
 CREATE TABLE Students(
     idnr        CHAR(10) NOT NULL PRIMARY KEY,
@@ -18,8 +15,8 @@ CREATE TABLE Branches(
 
 CREATE TABLE Courses(
     code        CHAR(6) PRIMARY KEY,
-    name        CHAR(2),
-    credits     FLOAT,
+    name        CHAR(2) NOT NULL,
+    credits     FLOAT NOT NULL,
     department  TEXT NOT NULL,
     CONSTRAINT positive_credit        CHECK(credits>0),
     CONSTRAINT valid_code_name_format CHECK(code LIKE 'CCC%'),
@@ -28,15 +25,15 @@ CREATE TABLE Courses(
 
 CREATE TABLE LimitedCourses(
     code        TEXT PRIMARY KEY,
-    capacity    INT,
+    capacity    INT NOT NULL,
     CONSTRAINT positive_capacity CHECK(capacity>0),
     FOREIGN KEY (code) REFERENCES Courses
 );
 
 CREATE TABLE StudentBranches(
     student     TEXT PRIMARY KEY,
-    branch      TEXT,
-    program     TEXT,
+    branch      TEXT NOT NULL,
+    program     TEXT NOT NULL,
     FOREIGN KEY (student) REFERENCES Students,
     FOREIGN KEY (branch, program) REFERENCES Branches
 );
@@ -47,10 +44,10 @@ CREATE TABLE Classifications(
 
 CREATE TABLE Classified(
     course       TEXT,
-    classifications TEXT,
-    PRIMARY KEY (course, classifications),
+    classification TEXT,
+    PRIMARY KEY (course, classification),
     FOREIGN KEY (course) REFERENCES Courses,
-    FOREIGN KEY (classifications) REFERENCES Classifications
+    FOREIGN KEY (classification) REFERENCES Classifications
 );
 
 CREATE TABLE MandatoryProgram(
@@ -65,7 +62,8 @@ CREATE TABLE MandatoryBranch(
     branch      TEXT,
     program     TEXT,
     PRIMARY KEY (course, branch, program),
-    FOREIGN KEY (branch, program) REFERENCES Branches
+    FOREIGN KEY (branch, program) REFERENCES Branches,
+    FOREIGN KEY (course) REFERENCES Courses
 );
 
 CREATE TABLE RecommendedBranch(
@@ -73,7 +71,8 @@ CREATE TABLE RecommendedBranch(
     branch      TEXT,
     program     TEXT,
     PRIMARY KEY (course, branch, program),
-    FOREIGN KEY (branch, program) REFERENCES Branches
+    FOREIGN KEY (branch, program) REFERENCES Branches,
+    FOREIGN KEY (course) REFERENCES Courses
 );
 
 CREATE TABLE Registered(
@@ -87,7 +86,7 @@ CREATE TABLE Registered(
 CREATE TABLE Taken(
     student     TEXT,
     course      TEXT,
-    grade       CHAR,
+    grade       CHAR NOT NULL,
     CONSTRAINT valid_grade CHECK(grade IN ('U','3','4','5')),
     PRIMARY KEY (student, course),
     FOREIGN KEY (student) REFERENCES Students,

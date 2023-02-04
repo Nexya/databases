@@ -13,7 +13,8 @@ FROM Taken;
 
 --PassedCourses(student, course, credits)
 CREATE VIEW PassedCourses AS
-SELECT * FROM FinishedCourses WHERE NOT grade = 'U';
+SELECT FinishedCourses.student, FinishedCourses.course, FinishedCourses.credits
+FROM FinishedCourses WHERE NOT grade = 'U';
 
 --Registrations(student, course, status)
 CREATE VIEW Registrations AS
@@ -34,12 +35,8 @@ SELECT StudentBranches.student, MandatoryBranch.course
 FROM StudentBranches, MandatoryBranch
 WHERE StudentBranches.program = MandatoryBranch.program
 EXCEPT
--- delete taken courses
-SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
-
-
---Qualified(student, status) 
---CREATE VIEW Qualified AS 
+-- delete taken courses with grade 3 or higher
+SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses; 
 
 
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
@@ -51,7 +48,12 @@ SELECT
     COALESCE(mathCredits,0)         AS mathCredits,
     COALESCE(researchCredits, 0)    AS researchCredits,
     COALESCE(seminarCourses,0)      AS seminarCourses,
-    'Placeholder'                   AS qualified
+    CASE WHEN MandatoryLeft IS NULL 
+    AND MathCredits >= 20 
+    AND ResearchCredits >= 10 
+    AND SeminarCourses >= 1 
+        THEN TRUE
+        ELSE FALSE END              AS qualified 
 FROM Students
 
 -- totalCredits
@@ -72,7 +74,7 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS mathCredits
     FROM PassedCourses
-    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classifications = 'math')
+    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classification = 'math')
     GROUP BY PassedCourses.student
 ) mathCredits ON Students.idnr = mathCredits.student
 
@@ -80,7 +82,7 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS researchCredits
     FROM PassedCourses
-    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classifications = 'research')
+    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classification = 'research')
     GROUP BY PassedCourses.student
 ) researchCredits ON Students.idnr = researchCredits.student
 
@@ -88,6 +90,6 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT PassedCourses.student, COUNT(PassedCourses.course) AS seminarCourses
     FROM PassedCourses
-    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classifications = 'seminar')
+    WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classification = 'seminar')
     GROUP BY PassedCourses.student
 ) seminarCourses ON Students.idnr = seminarCourses.student;
