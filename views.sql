@@ -1,15 +1,15 @@
 
 -- BasicInformation(idnr, name, login, program, branch)
 CREATE VIEW BasicInformation AS 
-SELECT Students.idnr, Students.name, Students.login, Students.program, 
-(SELECT branch FROM StudentBranches WHERE StudentBranches.student = Students.idnr) 
-FROM Students;
+SELECT Students.idnr, Students.name, Students.login, Students.program, branch
+FROM Students LEFT OUTER JOIN StudentBranches
+ON StudentBranches.student = Students.idnr;
 
 -- FinishedCourses(student, course, grade, credits)
 CREATE VIEW FinishedCourses AS
-SELECT Taken.student, Taken.course, Taken.grade,
-(SELECT credits FROM Courses WHERE Taken.course = Courses.code)
-FROM Taken;
+SELECT Taken.student, Taken.course, Taken.grade, credits
+FROM Taken LEFT OUTER JOIN Courses
+ON Taken.course = Courses.code;
 
 --PassedCourses(student, course, credits)
 CREATE VIEW PassedCourses AS
@@ -23,6 +23,7 @@ UNION
 SELECT Registered.student, Registered.course, 'registered' AS status FROM Registered;
 
 
+
 --UnreadMandatory(student, course)
 CREATE VIEW UnreadMandatory AS
 -- table of all courses from mandatory program
@@ -34,6 +35,7 @@ UNION
 SELECT StudentBranches.student, MandatoryBranch.course
 FROM StudentBranches, MandatoryBranch
 WHERE StudentBranches.program = MandatoryBranch.program
+AND StudentBranches.branch = MandatoryBranch.branch
 EXCEPT
 -- delete taken courses with grade 3 or higher
 SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses; 
@@ -52,6 +54,7 @@ SELECT
     AND MathCredits >= 20 
     AND ResearchCredits >= 10 
     AND SeminarCourses >= 1 
+    AND recommendedCredits >= 10
         THEN TRUE
         ELSE FALSE END              AS qualified 
 FROM Students
@@ -92,4 +95,12 @@ LEFT JOIN (
     FROM PassedCourses
     WHERE PassedCourses.course IN (SELECT Classified.course FROM Classified WHERE Classified.classification = 'seminar')
     GROUP BY PassedCourses.student
-) seminarCourses ON Students.idnr = seminarCourses.student;
+) seminarCourses ON Students.idnr = seminarCourses.student
+
+-- recommendedCredits
+LEFT JOIN (
+    SELECT PassedCourses.student, SUM(PassedCourses.credits) AS recommendedCredits
+    FROM PassedCourses, RecommendedBranch
+    WHERE PassedCourses.course = RecommendedBranch.course
+    GROUP BY PassedCourses.student
+) recommendedCredits ON Students.idnr = recommendedCredits.student;
