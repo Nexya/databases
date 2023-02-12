@@ -8,7 +8,7 @@ Branch(_name,_program)
 
 Course(_code,name,credits)
 
-Student(_ID,name,program)
+Student(_ID,login,name,program)
   program -> Program.name
 
 Classification(_name)
