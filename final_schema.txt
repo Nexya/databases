@@ -1,0 +1,54 @@
+Department(_name, abbr)
+  UNIQUE abbr
+
+Program(_name,abbr)
+
+Branch(_name,_program)
+  program -> Program.name
+
+Course(_code,name,credits)
+
+Student(_ID,login,name,program)
+  program -> Program.name
+  UNIQUE login
+
+Classification(_name)
+
+LimitedCourse(_code,places)
+  code -> Course.code
+
+HostedBy(_department,_program)
+  department -> Department.name
+  program -> Program.name
+
+Classified(_code,_classification)
+  code -> Course.code
+  classification-> Classification.name
+
+BelongsTo(_student,branch,program)
+  student -> Student.ID
+  (branch,program) -> Branch.(name,program)
+
+Reg(_student,_course)
+  student -> Student.ID
+  course -> Course.code
+
+Queue(_student,_limitedCourse,number)
+  student -> Student.ID
+  limitedCourse -> LimitedCourse.code
+
+Given(_course,_department)
+  course -> Course.code
+  department -> Department.name
+
+Mandatory(_program,_course)
+  program -> Program.name
+  course -> Course.code
+
+Reco(_branch,_program,_course)
+  (branch,program) -> Branch.(name,program)
+  course -> Course.code
+
+Taken(_student,_course,grade)
+  student -> Student.ID
+  course -> Course.code
