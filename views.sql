@@ -50,6 +50,7 @@ SELECT
     COALESCE(mathCredits,0)         AS mathCredits,
     COALESCE(researchCredits, 0)    AS researchCredits,
     COALESCE(seminarCourses,0)      AS seminarCourses,
+    COALESCE(recommendedCredits,0)  AS recommendedCredits,
     CASE WHEN MandatoryLeft IS NULL 
     AND MathCredits >= 20 
     AND ResearchCredits >= 10 

@@ -1,4 +1,14 @@
 
+CREATE TABLE Programs(
+    name        TEXT PRIMARY KEY,
+    abbr        TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE Departments(
+    name        TEXT PRIMARY KEY,
+    abbr        TEXT UNIQUE NOT NULL
+);
+
 CREATE TABLE Students(
     idnr        CHAR(10) NOT NULL PRIMARY KEY,
     CHECK (idnr LIKE '__________'),
@@ -19,8 +29,10 @@ CREATE TABLE Courses(
     code        TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     credits     FLOAT NOT NULL,
+    department  TEXT,
     CONSTRAINT positive_credit        CHECK(credits>0),
-    CONSTRAINT valid_code_name_format CHECK(code LIKE '______')
+    CONSTRAINT valid_code_name_format CHECK(code LIKE '______'),
+    FOREIGN KEY (department) REFERENCES Departments
 );
 
 CREATE TABLE LimitedCourses(
@@ -102,16 +114,6 @@ CREATE TABLE WaitingList(
     FOREIGN KEY (course)  REFERENCES LimitedCourses
 );
 
-CREATE TABLE Departments(
-    name        TEXT PRIMARY KEY,
-    abbr        TEXT UNIQUE NOT NULL
-);
-
-CREATE TABLE Programs(
-    name        TEXT PRIMARY KEY,
-    abbr        TEXT UNIQUE NOT NULL
-);
-
 CREATE TABLE HostedBy(
     department  TEXT,
     program     TEXT,
@@ -124,7 +126,7 @@ CREATE TABLE BelongsTo(
     student     TEXT PRIMARY KEY,
     branch      TEXT,
     program     TEXT,
-    FOREIGN KEY (student) REFERENCES Students.idnr,
+    FOREIGN KEY (student) REFERENCES Students,
     FOREIGN KEY (branch, program) REFERENCES Branches
 );
 
