@@ -41,6 +41,13 @@ EXCEPT
 SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses; 
 
 
+
+-- helper for recommendedcredits
+CREATE VIEW RecommendedCourses AS 
+SELECT student, course, credits AS recommendedCredits FROM StudentBranches AS SB JOIN RecommendedBranch AS RB
+ON (SB.branch, SB.program) = (RB.branch, RB.program) JOIN Courses AS C ON course = code;
+
+
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
 CREATE VIEW PathToGraduation AS
 SELECT 
@@ -50,7 +57,6 @@ SELECT
     COALESCE(mathCredits,0)         AS mathCredits,
     COALESCE(researchCredits, 0)    AS researchCredits,
     COALESCE(seminarCourses,0)      AS seminarCourses,
-    COALESCE(recommendedCredits,0)  AS recommendedCredits,
     CASE WHEN MandatoryLeft IS NULL 
     AND MathCredits >= 20 
     AND ResearchCredits >= 10 
@@ -101,7 +107,7 @@ LEFT JOIN (
 -- recommendedCredits
 LEFT JOIN (
     SELECT PassedCourses.student, SUM(PassedCourses.credits) AS recommendedCredits
-    FROM PassedCourses, RecommendedBranch
-    WHERE PassedCourses.course = RecommendedBranch.course
+    FROM PassedCourses LEFT OUTER JOIN RecommendedCourses ON PassedCourses.student = RecommendedCourses.student
+    WHERE PassedCourses.course = RecommendedCourses.course 
     GROUP BY PassedCourses.student
 ) recommendedCredits ON Students.idnr = recommendedCredits.student;

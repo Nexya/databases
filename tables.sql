@@ -29,7 +29,7 @@ CREATE TABLE Courses(
     code        TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     credits     FLOAT NOT NULL,
-    department  TEXT,
+    department  TEXT NOT NULL,
     CONSTRAINT positive_credit        CHECK(credits>0),
     CONSTRAINT valid_code_name_format CHECK(code LIKE '______'),
     FOREIGN KEY (department) REFERENCES Departments
@@ -124,8 +124,8 @@ CREATE TABLE HostedBy(
 
 CREATE TABLE BelongsTo(
     student     TEXT PRIMARY KEY,
-    branch      TEXT,
-    program     TEXT,
+    branch      TEXT NOT NULL,
+    program     TEXT NOT NUll,
     FOREIGN KEY (student) REFERENCES Students,
     FOREIGN KEY (branch, program) REFERENCES Branches
 );
