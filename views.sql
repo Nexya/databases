@@ -44,8 +44,9 @@ SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
 
 -- helper for recommendedcredits
 CREATE VIEW RecommendedCourses AS 
-SELECT student, course, credits AS recommendedCredits FROM StudentBranches AS SB JOIN RecommendedBranch AS RB
-ON (SB.branch, SB.program) = (RB.branch, RB.program) JOIN Courses AS C ON course = code;
+SELECT student, course, credits AS recommendedCredits FROM StudentBranches JOIN RecommendedBranch
+ON (StudentBranches.branch, StudentBranches.program) = (RecommendedBranch.branch, RecommendedBranch.program) 
+JOIN Courses ON course = code;
 
 
 -- PathToGraduation(student, totalCredits, mandatoryLeft, mathCredits, researchCredits, seminarCourses, qualified)
