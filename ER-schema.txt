@@ -20,7 +20,7 @@ HostedBy(_department,_program)
   department -> Department.name
   program -> Program.name
 
-Classified(_code,_classification)
+Classified(_code,classification)
   code -> Course.code
   classification-> Classification.name
 
@@ -32,7 +32,7 @@ Reg(_student,_course)
   student -> Student.ID
   course -> Course.code
 
-Queue(_student,_limitedCourse,number)
+Queue(_student,limitedCourse,number)
   student -> Student.ID
   limitedCourse -> LimitedCourse.code
 

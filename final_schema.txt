@@ -1,5 +1,4 @@
 Department(_name, abbr)
-  UNIQUE abbr
 
 Program(_name,abbr)
 
