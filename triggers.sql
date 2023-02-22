@@ -1,0 +1,9 @@
+CREATE TRIGGER checkGradeFound
+AFTER INSERT ON Registered
+FOR EACH ROW
+EXECUTE PROCEDURE haveGrade();
+
+CREATE TRIGGER checkOverCapacity
+AFTER INSERT ON Registered
+FOR EACH ROW
+EXECUTE PROCEDURE limitedCapacity();
