@@ -20,7 +20,7 @@ HostedBy(_department,_program)
   department -> Department.name
   program -> Program.name
 
-Classified(_code,classification)
+Classified(_code,_classification)
   code -> Course.code
   classification-> Classification.name
 
@@ -32,7 +32,7 @@ Reg(_student,_course)
   student -> Student.ID
   course -> Course.code
 
-Queue(_student,limitedCourse,number)
+Queue(_student,_limitedCourse,number)
   student -> Student.ID
   limitedCourse -> LimitedCourse.code
 
@@ -40,8 +40,12 @@ Given(_course,_department)
   course -> Course.code
   department -> Department.name
 
-Mandatory(_program,_course)
+MandatoryProgram(_program,_course)
   program -> Program.name
+  course -> Course.code
+
+MandatoryBranch(_name,_program,_course)
+  (name, program) -> Branch.(name,program)
   course -> Course.code
 
 Reco(_branch,_program,_course)
@@ -51,3 +55,7 @@ Reco(_branch,_program,_course)
 Taken(_student,_course,grade)
   student -> Student.ID
   course -> Course.code
+
+Prerequisite(_needCourse,_forCourse)
+  needCourse -> Course.code
+  forCourse -> Course.code

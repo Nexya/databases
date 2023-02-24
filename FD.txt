@@ -1,6 +1,6 @@
 D(studentIdnr, studentName, login, branchName, programName, courseCode, courseName, credits, departmentName, capacity, classification, grade, position)
 
-studentIdnr -> studentName login programName branchName credits
+studentIdnr -> studentName login programName branchName
 
 courseCode -> courseName credits departmentName capacity 
 
@@ -8,6 +8,7 @@ studentIdnr courseCode -> grade position
 
 courseCode position -> studentIdnr
 
+login -> studentIdnr
 
 
 BCNF normalization:
@@ -54,11 +55,32 @@ courseCode courseName credits departmentName -> capacity
 
 
 2. Attributes:
-studentIdnr studentName login branchName programName
+login studentIdnr studentName branchName programName
 Keys:
 studentIdnr
+login
 
 Functional dependencies:
+login -> studentIdnr
+login -> studentName
+login -> branchName
+login -> programName
+login programName -> studentIdnr
+login programName -> studentName
+login programName -> branchName
+login branchName -> studentIdnr
+login branchName -> studentName
+login branchName -> programName
+login branchName programName -> studentIdnr
+login branchName programName -> studentName
+studentName login -> studentIdnr
+studentName login -> branchName
+studentName login -> programName
+studentName login programName -> studentIdnr
+studentName login programName -> branchName
+studentName login branchName -> studentIdnr
+studentName login branchName -> programName
+studentName login branchName programName -> studentIdnr
 studentIdnr -> studentName
 studentIdnr -> login
 studentIdnr -> branchName
@@ -95,19 +117,19 @@ studentIdnr studentName login branchName -> programName
 
 
 3. Attributes:
-courseCode position studentIdnr grade
+courseCode position login grade
 Keys:
-courseCode studentIdnr
+courseCode login
 courseCode position
 
 Functional dependencies:
-courseCode studentIdnr -> position
-courseCode studentIdnr -> grade
-courseCode studentIdnr grade -> position
-courseCode position -> studentIdnr
+courseCode login -> position
+courseCode login -> grade
+courseCode login grade -> position
+courseCode position -> login
 courseCode position -> grade
-courseCode position grade -> studentIdnr
-courseCode position studentIdnr -> grade
+courseCode position grade -> login
+courseCode position login -> grade
 
 
 
@@ -120,11 +142,11 @@ Functional dependencies:
 none
 
 
-MVD and 4NF: 
+MVD :
 
-The last one have MVD: coursecode classification and position
 courseCode ->> classification
-courseCode ->> position
+
+4NF normalization :
 
 1. Attributes:
 courseCode classification
@@ -139,28 +161,18 @@ courseCode ->> classification
 
 
 2. Attributes:
-courseCode position
+login studentIdnr
 Keys:
-courseCode position
+studentIdnr
+login
 
 Functional dependencies:
-none
-Multivalued dependencies:
-courseCode ->> position
+login -> studentIdnr
+studentIdnr -> login
 
 
 
 3. Attributes:
-studentIdnr studentName
-Keys:
-studentIdnr
-
-Functional dependencies:
-studentIdnr -> studentName
-
-
-
-4. Attributes:
 courseCode courseName
 Keys:
 courseCode
@@ -170,17 +182,17 @@ courseCode -> courseName
 
 
 
-5. Attributes:
-studentIdnr login
+4. Attributes:
+login studentName
 Keys:
-studentIdnr
+login
 
 Functional dependencies:
-studentIdnr -> login
+login -> studentName
 
 
 
-6. Attributes:
+5. Attributes:
 courseCode credits
 Keys:
 courseCode
@@ -190,17 +202,17 @@ courseCode -> credits
 
 
 
-7. Attributes:
-studentIdnr branchName
+6. Attributes:
+login branchName
 Keys:
-studentIdnr
+login
 
 Functional dependencies:
-studentIdnr -> branchName
+login -> branchName
 
 
 
-8. Attributes:
+7. Attributes:
 courseCode departmentName
 Keys:
 courseCode
@@ -210,17 +222,17 @@ courseCode -> departmentName
 
 
 
-9. Attributes:
-studentIdnr programName
+8. Attributes:
+login programName
 Keys:
-studentIdnr
+login
 
 Functional dependencies:
-studentIdnr -> programName
+login -> programName
 
 
 
-:. Attributes:
+9. Attributes:
 courseCode capacity
 Keys:
 courseCode
@@ -230,12 +242,17 @@ courseCode -> capacity
 
 
 
-;. Attributes:
-courseCode studentIdnr grade
+:. Attributes:
+courseCode login grade position
 Keys:
-courseCode studentIdnr
+courseCode position
+courseCode login
 
 Functional dependencies:
-studentIdnr courseCode -> grade
-
-
+courseCode position -> login
+courseCode position -> grade
+courseCode grade position -> login
+login courseCode -> grade
+login courseCode -> position
+login courseCode position -> grade
+login courseCode grade -> position

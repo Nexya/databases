@@ -5,11 +5,11 @@ Program(_name,abbr)
 Branch(_name,_program)
   program -> Program.name
 
-Course(_code,name,credits)
+Course(_code,name,credits,department)
+  department -> department.name
 
 Student(_ID,login,name,program)
   program -> Program.name
-  UNIQUE login
 
 Classification(_name)
 
@@ -35,13 +35,18 @@ Reg(_student,_course)
 Queue(_student,_limitedCourse,number)
   student -> Student.ID
   limitedCourse -> LimitedCourse.code
+  UNIQUE (limitedCourse,number)
 
 Given(_course,_department)
   course -> Course.code
   department -> Department.name
 
-Mandatory(_program,_course)
+MandatoryProgram(_program,_course)
   program -> Program.name
+  course -> Course.code
+
+MandatoryBranch(_name,_program,_course)
+  (name, program) -> Branch.(name,program)
   course -> Course.code
 
 Reco(_branch,_program,_course)
@@ -51,3 +56,7 @@ Reco(_branch,_program,_course)
 Taken(_student,_course,grade)
   student -> Student.ID
   course -> Course.code
+
+Prerequisite(_needCourse,_forCourse)
+  needCourse -> Course.code
+  forCourse -> Course.code
