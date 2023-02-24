@@ -8,12 +8,12 @@ Branch(_name,_program)
 Course(_code,name,credits,department)
   department -> department.name
 
-Student(_ID,login,name,program)
+Student(_idnr,login,name,program)
   program -> Program.name
 
 Classification(_name)
 
-LimitedCourse(_code,places)
+LimitedCourse(_code,capacity)
   code -> Course.code
 
 HostedBy(_department,_program)
@@ -25,19 +25,19 @@ Classified(_code,_classification)
   classification-> Classification.name
 
 BelongsTo(_student,branch,program)
-  student -> Student.ID
+  student -> Student.idnr
   (branch,program) -> Branch.(name,program)
 
-Reg(_student,_course)
-  student -> Student.ID
+Registered(_student,_course)
+  student -> Student.idnr
   course -> Course.code
 
-Queue(_student,_limitedCourse,number)
-  student -> Student.ID
+WaitingList(_student,_limitedCourse,position)
+  student -> Student.idnr
   limitedCourse -> LimitedCourse.code
   UNIQUE (limitedCourse,number)
 
-Given(_course,_department)
+GivenBy(_course,_department)
   course -> Course.code
   department -> Department.name
 
@@ -49,12 +49,12 @@ MandatoryBranch(_name,_program,_course)
   (name, program) -> Branch.(name,program)
   course -> Course.code
 
-Reco(_branch,_program,_course)
+RecommendedBranch(_branch,_program,_course)
   (branch,program) -> Branch.(name,program)
   course -> Course.code
 
 Taken(_student,_course,grade)
-  student -> Student.ID
+  student -> Student.idnr
   course -> Course.code
 
 Prerequisite(_needCourse,_forCourse)
