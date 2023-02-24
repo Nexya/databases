@@ -1,15 +1,16 @@
 Department(_name, abbr)
 
-Program(_name,abbr)
+Programs(_name,abbr)
 
-Branch(_name,_program)
+Branches(_name,_program)
   program -> Program.name
 
 Course(_code,name,credits,department)
   department -> department.name
 
-Student(_idnr,login,name,program)
+Students(_idnr,login,name,program)
   program -> Program.name
+  UNIQUE login
 
 Classification(_name)
 

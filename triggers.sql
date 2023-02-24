@@ -2,58 +2,46 @@ CREATE VIEW CourseQueuePositions
 SELECT course, student, position AS place
 FROM WaitingList;
 
-
-
-CREATE TRIGGER checkGradeFound
-AFTER INSERT ON Registered
-FOR EACH ROW
-EXECUTE PROCEDURE haveGrade();
-
-CREATE FUNCTION gradeFound(stu TEXT,cou TEXT) RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN (SELECT (SELECT grade FROM Taken WHERE Taken.course = cou
-    AND Taken.student = stu) IS NOT NULL);
-END;
-$$ LANGUAGE 'plpgsql';
-
-CREATE FUNCTION haveGrade() RETURNS TRIGGER AS $$
-BEGIN
-    IF (gradeFound(NEW.student,NEW.course))
-        THEN RAISE EXCEPTION 'You already have a grade';
-    END IF;
-    RETURN NULL;
-END
-$$ LANGUAGE 'plpgsql';
-
-
-
-CREATE TRIGGER checkOverCapacity
-AFTER INSERT ON Registered
-FOR EACH ROW
-EXECUTE PROCEDURE limitedCapacity();
-
-CREATE FUNCTION isLimitedCapacityCourse(course TEXT) RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN (SELECT (SELECT code FROM LimitedCourses WHERE code = course) IS NOT NULL);
-END;
-$$ LANGUAGE 'plpgsql';
-
-CREATE FUNCTION limitedCapacity() RETURNS TRIGGER AS $$
+CREATE FUNCTION register() RETURNS TRIGGER AS $$
 DECLARE
-    currentCourseCapacity INT := 
-        (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = NEW.course);
-    studentRegistered INT := 
-        (SELECT (SELECT COUNT(student) FROM Registered WHERE Registered.course = NEW.course));
+    coursestatus TEXT;
+    currentCourseCapacity INT;
+    studentRegistered INT;
+    checkifpassed INT;
 BEGIN
-    IF (isLimitedCapacityCourse(NEW.course))
-        THEN 
-        IF (studentRegistered > currentCourseCapacity)
-            THEN
-            INSERT INTO WaitingList VALUES(NEW.student,NEW.course,5);
-            DELETE FROM Registered 
-            WHERE Registered.course = NEW.course AND Registered.student = NEW.student;
+
+    -- is student already registered or in waiting list? 
+    coursestatus := 
+        (SELECT status FROM registrations WHERE student=NEW.student AND course=NEW.course);
+        IF coursestatus='registered' THEN
+            RAISE EXCEPTION 'Student is already registered for this course';
         END IF;
-    END IF;
-    RETURN NULL;
+      
+        IF coursestatus='waiting' THEN
+            RAISE EXCEPTION 'Student is already in the waiting list for this course';
+        END IF;
+
+    -- has the student already passed the course? 
+    checkifpassed :=
+        (SELECT credits FROM PassedCourses WHERE student=NEW.student AND course=NEW.course)
+        IF checkifpassed >= 0 THEN 
+            RAISE EXCEPTION 'Student has already passed the course';
+        END IF;
+
+    -- has the student passed prerequisite ? 
+    checkprerequisite := 
+        
+
+    -- is course full? if not register student
+    currentCourseCapacity := 
+        (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = NEW.course);
+
+    studentsRegistered  := 
+        (SELECT (SELECT COUNT(student) FROM registrations WHERE registrations.course = NEW.course AND status = 'registered'));
+        IF studentRegistered >= currentCourseCapacityq THEN
+            INSERT INTO waitinglist VALUES (NEW.student, NEW.course);
+        ELSE
+            INSERT INTO registered VALUES (NEW.student, NEW.course);
+        END IF;
 END
 $$ LANGUAGE 'plpgsql';

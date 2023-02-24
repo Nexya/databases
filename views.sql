@@ -23,7 +23,6 @@ UNION
 SELECT Registered.student, Registered.course, 'registered' AS status FROM Registered;
 
 
-
 --UnreadMandatory(student, course)
 CREATE VIEW UnreadMandatory AS
 -- table of all courses from mandatory program

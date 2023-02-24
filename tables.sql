@@ -1,21 +1,11 @@
-
-CREATE TABLE Programs(
-    name        TEXT PRIMARY KEY,
-    abbr        TEXT UNIQUE NOT NULL
-);
-
 CREATE TABLE Departments(
     name        TEXT PRIMARY KEY,
     abbr        TEXT UNIQUE NOT NULL
 );
 
-CREATE TABLE Students(
-    idnr        CHAR(10) NOT NULL PRIMARY KEY,
-    CHECK (idnr LIKE '__________'),
-    name        TEXT NOT NULL,
-    login       TEXT NOT NULL UNIQUE,
-    program     TEXT NOT NULL,
-    FOREIGN KEY (program) REFERENCES Programs
+CREATE TABLE Programs(
+    name        TEXT PRIMARY KEY,
+    abbr        TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE Branches(
@@ -25,7 +15,7 @@ CREATE TABLE Branches(
     FOREIGN KEY (program) REFERENCES Programs
 );
 
-CREATE TABLE Courses(
+CREATE TABLE Course(
     code        TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     credits     FLOAT NOT NULL,
@@ -35,6 +25,19 @@ CREATE TABLE Courses(
     FOREIGN KEY (department) REFERENCES Departments
 );
 
+CREATE TABLE Students(
+    idnr        CHAR(10) NOT NULL PRIMARY KEY,
+    CHECK (idnr LIKE '__________'),
+    login       TEXT NOT NULL UNIQUE,
+    name        TEXT NOT NULL,
+    program     TEXT NOT NULL,
+    FOREIGN KEY (program) REFERENCES Programs
+);
+
+CREATE TABLE Classifications(
+    name        TEXT PRIMARY KEY
+);
+
 CREATE TABLE LimitedCourses(
     code        TEXT PRIMARY KEY,
     capacity    INT NOT NULL,
@@ -42,16 +45,12 @@ CREATE TABLE LimitedCourses(
     FOREIGN KEY (code) REFERENCES Courses
 );
 
-CREATE TABLE StudentBranches(
-    student     TEXT PRIMARY KEY,
-    branch      TEXT NOT NULL,
-    program     TEXT NOT NULL,
-    FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (branch, program) REFERENCES Branches
-);
-
-CREATE TABLE Classifications(
-    name        TEXT PRIMARY KEY
+CREATE TABLE HostedBy(
+    department  TEXT,
+    program     TEXT,
+    PRIMARY KEY (department, program),
+    FOREIGN KEY (department) REFERENCES Departments,
+    FOREIGN KEY (program) REFERENCES Programs
 );
 
 CREATE TABLE Classified(
@@ -62,11 +61,46 @@ CREATE TABLE Classified(
     FOREIGN KEY (classification) REFERENCES Classifications
 );
 
+CREATE TABLE BelongsTo(
+    student     TEXT PRIMARY KEY,
+    branch      TEXT NOT NULL,
+    program     TEXT NOT NULL,
+    FOREIGN KEY (student,program) REFERENCES Students,
+    FOREIGN KEY (branch, program) REFERENCES Branches
+);
+
+CREATE TABLE Registered(
+    student     TEXT,
+    course      TEXT,
+    PRIMARY KEY (student, course),
+    FOREIGN KEY (student) REFERENCES Students,
+    FOREIGN KEY (course)  REFERENCES Courses
+);
+
+CREATE TABLE WaitingList(
+    student             TEXT,
+    limitedCourse       TEXT,
+    position            SERIAL,
+    PRIMARY KEY (student, limitedCourse),
+    FOREIGN KEY (student)        REFERENCES Students,
+    FOREIGN KEY (limitedCourse)  REFERENCES LimitedCourses,
+    UNIQUE(limitedCourse, position)
+);
+
+CREATE TABLE GivenBy(
+    course      TEXT,
+    department  TEXT,
+    PRIMARY KEY (course, department),
+    FOREIGN KEY (course)  REFERENCES Courses,
+    FOREIGN KEY (department) REFERENCES Departments
+);
+
 CREATE TABLE MandatoryProgram(
     course      TEXT,
     program     TEXT,
     PRIMARY KEY (course, program),
-    FOREIGN KEY (course) REFERENCES Courses
+    FOREIGN KEY (course) REFERENCES Courses,
+    FOREIGN KEY (program) REFERENCES Programs
 );
 
 CREATE TABLE MandatoryBranch(
@@ -87,14 +121,6 @@ CREATE TABLE RecommendedBranch(
     FOREIGN KEY (course) REFERENCES Courses
 );
 
-CREATE TABLE Registered(
-    student     TEXT,
-    course      TEXT,
-    PRIMARY KEY (student, course),
-    FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (course)  REFERENCES Courses
-);
-
 CREATE TABLE Taken(
     student     TEXT,
     course      TEXT,
@@ -105,35 +131,16 @@ CREATE TABLE Taken(
     FOREIGN KEY (course)  REFERENCES Courses
 );
 
-CREATE TABLE WaitingList(
-    student     TEXT,
-    course      TEXT,
-    position    SERIAL,
-    PRIMARY KEY (student, course),
-    FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (course)  REFERENCES LimitedCourses
+
+CREATE TABLE Prerequisite(
+    needCourse  TEXT,
+    forCourse   TEXT,
+    PRIMARY KEY (needCourse, forCourse),
+    FOREIGN KEY (needCourse) REFERENCES Courses,
+    FOREIGN KEY (forCourse) REFERENCES Courses
 );
 
-CREATE TABLE HostedBy(
-    department  TEXT,
-    program     TEXT,
-    PRIMARY KEY (department, program),
-    FOREIGN KEY (department) REFERENCES Departments,
-    FOREIGN KEY (program) REFERENCES Programs
-);
 
-CREATE TABLE BelongsTo(
-    student     TEXT PRIMARY KEY,
-    branch      TEXT NOT NULL,
-    program     TEXT NOT NUll,
-    FOREIGN KEY (student) REFERENCES Students,
-    FOREIGN KEY (branch, program) REFERENCES Branches
-);
 
-CREATE TABLE GivenBy(
-    course      TEXT,
-    department  TEXT,
-    PRIMARY KEY (course, department),
-    FOREIGN KEY (course)  REFERENCES Courses,
-    FOREIGN KEY (department) REFERENCES Departments
-);
+
+
