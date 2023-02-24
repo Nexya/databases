@@ -25,7 +25,7 @@ Classified(_code,_classification)
   classification-> Classification.name
 
 BelongsTo(_student,branch,program)
-  student -> Student.idnr
+  (student, program) → Students.(idnr, program)
   (branch,program) -> Branch.(name,program)
 
 Registered(_student,_course)
