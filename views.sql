@@ -2,8 +2,8 @@
 -- BasicInformation(idnr, name, login, program, branch)
 CREATE VIEW BasicInformation AS 
 SELECT Students.idnr, Students.name, Students.login, Students.program, branch
-FROM Students LEFT OUTER JOIN StudentBranches
-ON StudentBranches.student = Students.idnr;
+FROM Students LEFT OUTER JOIN BelongsTo
+ON BelongsTo.student = Students.idnr;
 
 -- FinishedCourses(student, course, grade, credits)
 CREATE VIEW FinishedCourses AS
@@ -18,7 +18,7 @@ FROM FinishedCourses WHERE NOT grade = 'U';
 
 --Registrations(student, course, status)
 CREATE VIEW Registrations AS
-SELECT WaitingList.student, WaitingList.course, 'waiting' AS status FROM WaitingList
+SELECT WaitingList.student, WaitingList.limitedCourse AS course, 'waiting' AS status FROM WaitingList
 UNION
 SELECT Registered.student, Registered.course, 'registered' AS status FROM Registered;
 
@@ -31,10 +31,10 @@ FROM Students, MandatoryProgram
 WHERE Students.program = MandatoryProgram.program
 UNION
 -- table of all courses from mandatory branch
-SELECT StudentBranches.student, MandatoryBranch.course
-FROM StudentBranches, MandatoryBranch
-WHERE StudentBranches.program = MandatoryBranch.program
-AND StudentBranches.branch = MandatoryBranch.branch
+SELECT BelongsTo.student, MandatoryBranch.course
+FROM BelongsTo, MandatoryBranch
+WHERE BelongsTo.program = MandatoryBranch.program
+AND BelongsTo.branch = MandatoryBranch.branch
 EXCEPT
 -- delete taken courses with grade 3 or higher
 SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses; 
@@ -43,8 +43,8 @@ SELECT PassedCourses.student, PassedCourses.course FROM PassedCourses;
 
 -- helper for recommendedcredits
 CREATE VIEW RecommendedCourses AS 
-SELECT student, course, credits AS recommendedCredits FROM StudentBranches JOIN RecommendedBranch
-ON (StudentBranches.branch, StudentBranches.program) = (RecommendedBranch.branch, RecommendedBranch.program) 
+SELECT student, course, credits AS recommendedCredits FROM BelongsTo JOIN RecommendedBranch
+ON (BelongsTo.branch, BelongsTo.program) = (RecommendedBranch.branch, RecommendedBranch.program) 
 JOIN Courses ON course = code;
 
 

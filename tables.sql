@@ -15,7 +15,7 @@ CREATE TABLE Branches(
     FOREIGN KEY (program) REFERENCES Programs
 );
 
-CREATE TABLE Course(
+CREATE TABLE Courses(
     code        TEXT PRIMARY KEY,
     name        TEXT NOT NULL,
     credits     FLOAT NOT NULL,
@@ -31,7 +31,8 @@ CREATE TABLE Students(
     login       TEXT NOT NULL UNIQUE,
     name        TEXT NOT NULL,
     program     TEXT NOT NULL,
-    FOREIGN KEY (program) REFERENCES Programs
+    FOREIGN KEY (program) REFERENCES Programs,
+    UNIQUE(idnr,program)
 );
 
 CREATE TABLE Classifications(
@@ -65,7 +66,7 @@ CREATE TABLE BelongsTo(
     student     TEXT PRIMARY KEY,
     branch      TEXT NOT NULL,
     program     TEXT NOT NULL,
-    FOREIGN KEY (student,program) REFERENCES Students,
+    FOREIGN KEY (student,program) REFERENCES Students(idnr,program),
     FOREIGN KEY (branch, program) REFERENCES Branches
 );
 

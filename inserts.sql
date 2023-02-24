@@ -11,7 +11,7 @@ INSERT INTO Students VALUES ('1111111111','N1','ls1','Prog1');
 INSERT INTO Students VALUES ('2222222222','N2','ls2','Prog1');
 INSERT INTO Students VALUES ('3333333333','N3','ls3','Prog2');
 INSERT INTO Students VALUES ('4444444444','N4','ls4','Prog1');
-INSERT INTO Students VALUES ('5555555555','Nx','ls5','Prog2');
+INSERT INTO Students VALUES ('5555555555','N5','ls5','Prog2');
 INSERT INTO Students VALUES ('6666666666','Nx','ls6','Prog2');
 
 INSERT INTO Courses VALUES ('CCC111','C1',22.5,'Dep1');
@@ -33,10 +33,10 @@ INSERT INTO Classified VALUES ('CCC444','research');
 INSERT INTO Classified VALUES ('CCC444','seminar');
 
 
-INSERT INTO StudentBranches VALUES ('2222222222','B1','Prog1');
-INSERT INTO StudentBranches VALUES ('3333333333','B1','Prog2');
-INSERT INTO StudentBranches VALUES ('4444444444','B1','Prog1');
-INSERT INTO StudentBranches VALUES ('5555555555','B1','Prog2');
+INSERT INTO BelongsTo VALUES ('2222222222','B1','Prog1');
+INSERT INTO BelongsTo VALUES ('3333333333','B1','Prog2');
+INSERT INTO BelongsTo VALUES ('4444444444','B1','Prog1');
+INSERT INTO BelongsTo VALUES ('5555555555','B1','Prog2');
 
 INSERT INTO MandatoryProgram VALUES ('CCC111','Prog1');
 

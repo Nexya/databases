@@ -1,5 +1,5 @@
-CREATE VIEW CourseQueuePositions
-SELECT course, student, position AS place
+CREATE VIEW CourseQueuePositions As
+SELECT student, limitedCourse AS course, position AS place
 FROM WaitingList;
 
 CREATE FUNCTION register() RETURNS TRIGGER AS $$
@@ -29,7 +29,7 @@ BEGIN
         END IF;
 
     -- has the student passed prerequisite ? 
-    checkprerequisite := 
+    --checkprerequisite := 
         
 
     -- is course full? if not register student

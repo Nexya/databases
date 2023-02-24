@@ -17,7 +17,7 @@ SET client_min_messages TO NOTICE; -- More talk
 -- Note that these are not SQL statements but rather Postgres commands (no terminating ;). 
 \ir tables.sql
 \ir functions.sql
-\ir triggers.sql
+--\ir triggers.sql
 \ir inserts.sql
 \ir views.sql
 
