@@ -17,7 +17,6 @@ BEGIN
         IF checkcoursestatus='registered' THEN
             RAISE EXCEPTION 'Student is already registered for this course';
         END IF;
-      
         IF checkcoursestatus='waiting' THEN
             RAISE EXCEPTION 'Student is already in the waiting list for this course';
         END IF;
@@ -28,10 +27,6 @@ BEGIN
         IF checkifpassed >= 0 THEN 
             RAISE EXCEPTION 'Student has already passed the course';
         END IF;
-
-    -- has the student passed prerequisite ? 
-    --checkprerequisite := 
-        
 
     -- is course full? if not register student
     checkcurrentCourseCapacity := 
