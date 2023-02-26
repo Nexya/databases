@@ -4,14 +4,14 @@ FROM WaitingList;
 
 CREATE FUNCTION register() RETURNS TRIGGER AS $$
 DECLARE
-    coursestatus TEXT;
-    currentCourseCapacity INT;
-    studentRegistered INT;
+    checkcoursestatus TEXT;
+    checkcurrentCourseCapacity INT;
+    studentsRegistered INT;
     checkifpassed INT;
 BEGIN
 
     -- is student already registered or in waiting list? 
-    coursestatus := 
+    checkcoursestatus := 
         (SELECT status FROM registrations WHERE student=NEW.student AND course=NEW.course);
         IF coursestatus='registered' THEN
             RAISE EXCEPTION 'Student is already registered for this course';
@@ -23,7 +23,7 @@ BEGIN
 
     -- has the student already passed the course? 
     checkifpassed :=
-        (SELECT credits FROM PassedCourses WHERE student=NEW.student AND course=NEW.course)
+        (SELECT credits FROM PassedCourses WHERE student=NEW.student AND course=NEW.course);
         IF checkifpassed >= 0 THEN 
             RAISE EXCEPTION 'Student has already passed the course';
         END IF;
@@ -33,7 +33,7 @@ BEGIN
         
 
     -- is course full? if not register student
-    currentCourseCapacity := 
+    checkcurrentCourseCapacity := 
         (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = NEW.course);
 
     studentsRegistered  := 
@@ -43,5 +43,5 @@ BEGIN
         ELSE
             INSERT INTO registered VALUES (NEW.student, NEW.course);
         END IF;
-END
+END;
 $$ LANGUAGE 'plpgsql';
