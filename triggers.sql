@@ -2,22 +2,23 @@ CREATE VIEW CourseQueuePositions As
 SELECT student, limitedCourse AS course, position AS place
 FROM WaitingList;
 
-CREATE FUNCTION register() RETURNS TRIGGER AS $$
+
+CREATE FUNCTION register() RETURNS TRIGGER AS $register$
 DECLARE
     checkcoursestatus TEXT;
     checkcurrentCourseCapacity INT;
-    studentsRegistered INT;
+    checkstudentsRegistered INT;
     checkifpassed INT;
 BEGIN
 
     -- is student already registered or in waiting list? 
     checkcoursestatus := 
         (SELECT status FROM registrations WHERE student=NEW.student AND course=NEW.course);
-        IF coursestatus='registered' THEN
+        IF checkcoursestatus='registered' THEN
             RAISE EXCEPTION 'Student is already registered for this course';
         END IF;
       
-        IF coursestatus='waiting' THEN
+        IF checkcoursestatus='waiting' THEN
             RAISE EXCEPTION 'Student is already in the waiting list for this course';
         END IF;
 
@@ -36,12 +37,18 @@ BEGIN
     checkcurrentCourseCapacity := 
         (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = NEW.course);
 
-    studentsRegistered  := 
+    checkstudentsRegistered  := 
         (SELECT (SELECT COUNT(student) FROM registrations WHERE registrations.course = NEW.course AND status = 'registered'));
-        IF studentRegistered >= currentCourseCapacityq THEN
+        IF checkstudentsRegistered >= checkcurrentCourseCapacity THEN
             INSERT INTO waitinglist VALUES (NEW.student, NEW.course);
         ELSE
             INSERT INTO registered VALUES (NEW.student, NEW.course);
         END IF;
+
+    RETURN NEW;
 END;
-$$ LANGUAGE 'plpgsql';
+$register$ LANGUAGE 'plpgsql';
+
+
+CREATE TRIGGER register INSTEAD OF INSERT OR UPDATE ON registrations
+    FOR EACH ROW EXECUTE FUNCTION register();
