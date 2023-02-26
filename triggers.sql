@@ -2,6 +2,8 @@ CREATE VIEW CourseQueuePositions As
 SELECT student, limitedCourse AS course, position AS place
 FROM WaitingList;
 
+-- REGISTER TRIGGER
+ 
 CREATE FUNCTION getCourseCapacity (course TEXT) RETURNS INT
 LANGUAGE SQL
     RETURN (SELECT (SELECT capacity
@@ -63,7 +65,7 @@ $register$ LANGUAGE 'plpgsql';
 CREATE TRIGGER register INSTEAD OF INSERT ON registrations
     FOR EACH ROW EXECUTE FUNCTION register();
 
----
+--- UNREGISTER TRIGGER
 
 CREATE PROCEDURE removeRegistration(stu TEXT, cou TEXT)
 LANGUAGE SQL
@@ -73,27 +75,10 @@ WHERE student = stu
 AND course = cou
 $$;
 
-/* CREATE FUNCTION insertIfOpen() RETURNS TRIGGER AS $$
-BEGIN
---IF (isLimitedCourse(OLD.course) AND NOT isCourseFull(OLD.course)) THEN
-    --WHERE limitedCourse IN (SELECT course FROM CourseQueuePositions WHERE position = 1 AND course = 'CCC222')
-    UPDATE Registrations SET status = 'Registered'
-    FROM CourseQueuePositions
-    WHERE CourseQueuePositions.course = 'CCC222'
-    AND CourseQueuePositions.place = 1;
-    UPDATE WaitingList SET position = position - 1 WHERE limitedCourse = old.course;
---END IF;
-RETURN NULL;
-END
-$$ LANGUAGE 'plpgsql'; */
 
 CREATE OR REPLACE FUNCTION unregister() RETURNS trigger AS $unregister$
-        DECLARE
-          -- namn på checks
     BEGIN
-        --- checks
-                --example
-                --Remove student first student from waiting list and place in registered
+        --Remove student first student from waiting list and place in registered
         WITH student AS (DELETE FROM WaitingList WHERE old.course = limitedCourse AND position = 1
         RETURNING *)
             INSERT INTO Registered SELECT student, limitedCourse FROM student;
@@ -102,7 +87,7 @@ CREATE OR REPLACE FUNCTION unregister() RETURNS trigger AS $unregister$
 
         DELETE FROM Registered WHERE student = OLD.student AND course = old.course;
 
-          RETURN NEW;
+        RETURN NEW;
     END;
 $unregister$ LANGUAGE 'plpgsql';
 
