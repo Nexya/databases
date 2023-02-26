@@ -2,12 +2,32 @@ CREATE VIEW CourseQueuePositions As
 SELECT student, limitedCourse AS course, position AS place
 FROM WaitingList;
 
+CREATE FUNCTION getCourseCapacity (course TEXT) RETURNS INT
+LANGUAGE SQL
+    RETURN (SELECT (SELECT capacity
+                    FROM LimitedCourses
+                    WHERE LimitedCourses.code = course));
+
+CREATE FUNCTION getStudentRegistered (course TEXT) RETURNS INT
+LANGUAGE SQL
+    RETURN (SELECT (SELECT COUNT(student)
+                    FROM registrations
+                    WHERE registrations.course = course
+                    AND status = 'registered'));
+
+CREATE FUNCTION isCourseFull (course TEXT) RETURNS BOOLEAN
+LANGUAGE SQL
+    RETURN getStudentRegistered(course) > getCourseCapacity(course);
+
+CREATE FUNCTION isLimitedCourse (course TEXT) RETURNS BOOLEAN
+LANGUAGE SQL
+    RETURN (SELECT (SELECT code
+                   FROM LimitedCourses
+                   WHERE code = course) IS NOT NULL);
 
 CREATE FUNCTION register() RETURNS TRIGGER AS $register$
 DECLARE
     checkcoursestatus TEXT;
-    checkcurrentCourseCapacity INT;
-    checkstudentsRegistered INT;
     checkifpassed INT;
 BEGIN
 
@@ -29,12 +49,7 @@ BEGIN
         END IF;
 
     -- is course full? if not register student
-    checkcurrentCourseCapacity := 
-        (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = NEW.course);
-
-    checkstudentsRegistered  := 
-        (SELECT (SELECT COUNT(student) FROM registrations WHERE registrations.course = NEW.course AND status = 'registered'));
-        IF checkstudentsRegistered >= checkcurrentCourseCapacity THEN
+        IF isCourseFull(New.Course) THEN
             INSERT INTO waitinglist VALUES (NEW.student, NEW.course);
         ELSE
             INSERT INTO registered VALUES (NEW.student, NEW.course);
@@ -47,3 +62,30 @@ $register$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER register INSTEAD OF INSERT OR UPDATE ON registrations
     FOR EACH ROW EXECUTE FUNCTION register();
+
+---
+
+CREATE PROCEDURE removeRegistration(stu TEXT, cou TEXT)
+LANGUAGE SQL
+AS $$
+DELETE FROM Registered
+WHERE student = stu
+AND course = cou
+$$;
+
+CREATE FUNCTION insertIfOpen() RETURNS TRIGGER AS $$
+BEGIN
+IF (isLimitedCourse(OLD.course) AND NOT isCourseFull(OLD.course)) THEN
+    UPDATE Registrations SET status = 'Registered'
+    FROM CourseQueuePositions
+    WHERE CourseQueuePositions.course = OLD.course
+    AND CourseQueuePositions.place = 1;
+END IF;
+RETURN NULL;
+END
+$$ LANGUAGE 'plpgsql';
+
+
+CREATE TRIGGER newSpot AFTER DELETE ON Registered
+FOR EACH STATEMENT
+EXECUTE FUNCTION insertIfOpen();
