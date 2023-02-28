@@ -2,6 +2,8 @@ CREATE VIEW CourseQueuePositions As
 SELECT student, limitedCourse AS course, position AS place
 FROM WaitingList;
 
+-- REGISTER TRIGGER
+ 
 CREATE FUNCTION getCourseCapacity (course TEXT) RETURNS INT
 LANGUAGE SQL
     RETURN (SELECT (SELECT capacity
@@ -69,6 +71,7 @@ $register$ LANGUAGE 'plpgsql';
 CREATE TRIGGER register INSTEAD OF INSERT ON registrations
     FOR EACH ROW EXECUTE FUNCTION register();
 
+--- UNREGISTER TRIGGER
 
 CREATE PROCEDURE removeRegistration(stu TEXT, cou TEXT)
 LANGUAGE SQL
@@ -92,7 +95,7 @@ CREATE OR REPLACE FUNCTION unregister() RETURNS trigger AS $unregister$
             INSERT INTO Registered SELECT student, limitedCourse FROM student;
         DELETE FROM Registered WHERE student = OLD.student AND course = old.course;
 
-          RETURN NEW;
+        RETURN NEW;
     END;
 $unregister$ LANGUAGE 'plpgsql';
 

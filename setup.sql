@@ -1,3 +1,13 @@
+/* testing purposes
+-- This script deletes everything in your database
+\set QUIET true
+SET client_min_messages TO WARNING; -- Less talk please.
+-- This script deletes everything in your database
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO CURRENT_USER;
+*/
+
 CREATE TABLE Departments(
     name        TEXT PRIMARY KEY,
     abbr        TEXT UNIQUE NOT NULL
