@@ -1,0 +1,8 @@
+LAB 3
+
+Implement unfinished tests 
+Prerequisite for registered trigger
+Check the syntax from the autocheck
+
+LAB 4
+Start working on it 
