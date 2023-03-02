@@ -18,6 +18,10 @@ INSERT INTO Registrations VALUES ('4444444444','CCC111');
 -- EXPECTED OUTCOME: Fail
 INSERT INTO Registrations VALUES ('1111111111','CCC222');
 
--- TEST #6: Insert into a non-full course
+-- TEST #6: Unregister registered student
 -- EXPECTED OUTCOME: Pass
--- DELETE FROM Registered WHERE student = '1111111111'AND course = 'CCC333';
+DELETE FROM Registered WHERE student = '2222222222' AND course = 'CCC111';
+
+-- TEST #7: Unregister student that has already been unregistered
+-- EXPECTED OUTCOME: Fail
+DELETE FROM Registered WHERE student = '2222222222' AND course = 'CCC111';

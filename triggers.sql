@@ -13,7 +13,6 @@ DECLARE
     checkPrerequisite TEXT;
 BEGIN
 
-
     -- has the student passed the required prerequisite? 
     checkPrerequisite := 
         ((SELECT needCourse FROM Prerequisite WHERE forCourse = NEW.course) 
@@ -40,9 +39,6 @@ BEGIN
             RAISE EXCEPTION 'Student has already passed the course';
         END IF;
 
-     
-
-
     -- is course full? if not register student
     checkCoursecapacity := 
         (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = NEW.course);
@@ -62,22 +58,41 @@ $register$ LANGUAGE 'plpgsql';
 CREATE TRIGGER register INSTEAD OF INSERT ON registrations
     FOR EACH ROW EXECUTE FUNCTION register();
 
+
+
+
 --- UNREGISTER TRIGGER
 
 CREATE OR REPLACE FUNCTION unregister() RETURNS trigger AS $unregister$
     DECLARE
-    updateCoursecapacity INT;
-
+        checkUnregistered TEXT;
+        courseCount INT;
+        numStudents INT;
     BEGIN
-        -- delete student from registered and waiting list
+        -- check if student is already unregistered or not registered to begin with
+        checkUnregistered := 
+            (SELECT student FROM Registrations WHERE student = OLD.student AND course = OLD.course);
+        IF checkUnregistered IS NOT NULL THEN
+            RAISE EXCEPTION 'Student is not registered, and therefore cannot be unregistered';
+        END IF;
+
+        -- delete student from registered and/or waiting list
         DELETE FROM Registered  WHERE student = OLD.student AND course = OLD.course;
         DELETE FROM WaitingList WHERE student = OLD.student AND course = OLD.course;
 
-        updateCoursecapacity := 
-            (SELECT capacity FROM LimitedCourses WHERE code = OLD.course);
-            
+        -- check course capacity if next student in waiting list can register, if yes do so
+        courseCount := 
+            (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = OLD.course);
+        numStudents := 
+            (SELECT COUNT(*) FROM Registered WHERE Registered.course = OLD.course);
+        IF numStudents < courseCount THEN 
+            INSERT INTO Registered (SELECT student, course FROM WaitingList WHERE course = OLD.course AND position = 1);
+            DELETE FROM WaitingList WHERE student = OLD.student AND course = OLD.course AND position = 1);
+        END IF;
 
-        RETURN NEW;
+        -- update waiting list TODO: needs to loop through each position
+        UPDATE WaitingList SET position = position - 1 WHERE OLD.position < position AND OLD.limitedCourse = limitedCourse;
+        RETURN NULL;
     END;
 $unregister$ LANGUAGE 'plpgsql';
 

@@ -1,8 +1,9 @@
 LAB 3
 
 Implement unfinished tests 
-Prerequisite for registered trigger
-Rewrite and minimize functions
+Unregister already unregistered with error 
+loop through waitinglist and update each position with -1
+register first person in waitinglist
 
 LAB 4
 Start working on it 
