@@ -1,4 +1,4 @@
-/* testing purposes
+
 -- This script deletes everything in your database
 \set QUIET true
 SET client_min_messages TO WARNING; -- Less talk please.
@@ -6,7 +6,7 @@ SET client_min_messages TO WARNING; -- Less talk please.
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO CURRENT_USER;
-*/
+
 
 CREATE TABLE Departments(
     name        TEXT PRIMARY KEY,
@@ -223,7 +223,7 @@ INSERT INTO WaitingList VALUES('3333333333','CCC222',1);
 INSERT INTO WaitingList VALUES('3333333333','CCC333',1);
 INSERT INTO WaitingList VALUES('2222222222','CCC333',2);
 
-
+INSERT INTO Prerequisite VALUES('CCC111','CCC222');
 
 -- BasicInformation(idnr, name, login, program, branch)
 CREATE VIEW BasicInformation AS 

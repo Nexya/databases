@@ -1,10 +1,6 @@
-
--- TESTS FOR REGISTER
----------------------------------------------
-
 -- TEST #1: Register for an unlimited course.
 -- EXPECTED OUTCOME: Pass
---INSERT INTO Registrations VALUES ('2222222222', 'CCC111');
+INSERT INTO Registrations VALUES ('2222222222', 'CCC111');
 
 -- TEST #2: Register an already registered student.
 -- EXPECTED OUTCOME: Fail
@@ -18,20 +14,10 @@ INSERT INTO Registrations VALUES ('4444444444', 'CCC555');
 -- EXPECTED OUTCOME: Fail
 INSERT INTO Registrations VALUES ('4444444444','CCC111');
 
-
-
--- TESTS FOR UNREGISTER
----------------------------------------------
-
-
+-- TEST #5: Check prerequisite.
+-- EXPECTED OUTCOME: Fail
+INSERT INTO Registrations VALUES ('1111111111','CCC222');
 
 -- TEST #6: Insert into a non-full course
 -- EXPECTED OUTCOME: Pass
 -- DELETE FROM Registered WHERE student = '1111111111'AND course = 'CCC333';
-
-/* SELECT (SELECT status 
-        FROM registrations 
-        WHERE student = '3333333333'
-        AND course = 'CCC333') = 'registered' AS successful_Queue_Insert;
-
-SELECT * FROM CourseQueuePositions WHERE course = 'CCC333'; */
