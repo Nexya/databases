@@ -1,8 +1,5 @@
 LAB 3
 
-Implement unfinished tests 
-Make sure the UPDATE for waitinglist position works if a student from the middle of the wait is removed
-Add example for overfull course
 
 LAB 4
 Start working on it 
