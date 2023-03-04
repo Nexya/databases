@@ -22,9 +22,13 @@ INSERT INTO Registrations VALUES ('1111111111','CCC222');
 -- EXPECTED OUTCOME: Pass
 DELETE FROM Registrations WHERE student = '2222222222' AND course = 'CCC111';
 
--- TEST #9: Unregister student that has already been unregistered
--- EXPECTED OUTCOME: Fail
-DELETE FROM Registrations WHERE student = '2222222222' AND course = 'CCC111'; -- NOT WORKING
+-- TEST #7: Unregister from a limited course with a waiting list
+-- EXPECTED OUTCOME: Pass
+DELETE FROM Registrations WHERE student = '1111111111' AND course ='CCC333';
+
+-- TEST #8: Unregister from a limited course without a waiting list
+-- EXPECTED OUTCOME: Pass
+DELETE FROM Registrations WHERE student = '5555555555' AND course = 'CCC666';
 
 -- TEST #10: Add student to waitinglist that is already there 
 -- EXPECTED OUTCOME: Fail
@@ -34,6 +38,6 @@ INSERT INTO Registrations VALUES ('3333333333','CCC222');
 -- EXPECTED OUTCOME: Pass
 INSERT INTO Registrations VALUES ('5555555555','CCC333');
 
--- TEST #12: Unregister from an overfull course with a waiting list -- ADD OVERFULL 
+-- TEST #12: Unregister from an overfull course with a waiting list
 -- EXPECTED OUTCOME: Pass
-DELETE FROM Registrations WHERE course = 'CCC333' AND student = '2222222222';
+DELETE FROM Registrations WHERE course = 'CCC222' AND student = '2222222222';

@@ -1,7 +1,6 @@
 LAB 3
 
 Implement unfinished tests 
-Unregister already unregistered with error 
 Make sure the UPDATE for waitinglist position works if a student from the middle of the wait is removed
 Add example for overfull course
 

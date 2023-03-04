@@ -11,7 +11,7 @@ DECLARE
     checkRegistered INT;
     checkPassed INT;
     checkPrerequisite TEXT;
-    newposition INT;
+    newPosition INT;
 BEGIN
 
     -- has the student passed the required prerequisite? 
@@ -47,11 +47,11 @@ BEGIN
     checkRegistered  := 
         (SELECT (SELECT COUNT(student) FROM registrations WHERE registrations.course = NEW.course AND status = 'registered'));
         IF checkRegistered >= checkCoursecapacity THEN
-            newposition := 
+            newPosition := 
                 ((SELECT MAX(place) FROM CourseQueuePositions WHERE CourseQueuePositions.course = NEW.course) + 1);
-            INSERT INTO waitinglist VALUES (NEW.student, NEW.course, newposition);
+            INSERT INTO WaitingList VALUES (NEW.student, NEW.course, newPosition);
         ELSE
-            INSERT INTO registered VALUES (NEW.student, NEW.course);
+            INSERT INTO Registered VALUES (NEW.student, NEW.course);
         END IF;
 
     
@@ -70,29 +70,25 @@ CREATE OR REPLACE FUNCTION unregister() RETURNS trigger AS $unregister$
         checkUnregistered TEXT;
         courseCount INT;
         numStudents INT;
+        oldPosition INT;
     BEGIN
-        -- check if student is already unregistered or not registered to begin with
-        checkUnregistered := 
-            (SELECT COUNT(student) FROM Registrations WHERE student = OLD.student AND course = OLD.course);
-        IF checkUnregistered IS NULL THEN
-            RAISE EXCEPTION 'Student is not registered, and therefore cannot be unregistered';
-        END IF;
 
         -- delete student from registered and/or waiting list
         DELETE FROM Registered  WHERE student = OLD.student AND course = OLD.course;
         DELETE FROM WaitingList WHERE student = OLD.student AND limitedCourse = OLD.course;
         
-
         -- check course capacity if next student in waiting list can register, if yes do so
         courseCount := 
             (SELECT capacity FROM LimitedCourses WHERE LimitedCourses.code = OLD.course);
         numStudents := 
             (SELECT COUNT(student) FROM Registered WHERE Registered.course = OLD.course);
         IF numStudents < courseCount THEN 
-            INSERT INTO Registered (SELECT student, course FROM WaitingList WHERE course = OLD.course AND position = 1);
+            INSERT INTO Registered (SELECT student, limitedCourse FROM WaitingList WHERE limitedCourse = OLD.course AND position = 1);
             DELETE FROM WaitingList WHERE position = 1;
              -- update waiting list
-            UPDATE WaitingList SET position = position - 1 WHERE limitedCourse = OLD.course; -- TODO: add so it works correctly when middle of list is removed
+             oldPosition := 
+                (SELECT position FROM WaitingList WHERE limitedCourse = OLD.course AND student = OLD.student);
+            UPDATE WaitingList SET position = position - 1 WHERE limitedCourse = OLD.course AND position > oldPosition;
         END IF;
 
         RETURN NULL;
