@@ -6,11 +6,11 @@ public class PortalConnection {
 
     // Set this to e.g. "portal" if you have created a database named portal
     // Leave it blank to use the default database of your database user
-    static final String DBNAME = "";
+    static final String DBNAME = "portal";
     // For connecting to the portal database on your local machine
     static final String DATABASE = "jdbc:postgresql://localhost/"+DBNAME;
     static final String USERNAME = "postgres";
-    static final String PASSWORD = "postgres";
+    static final String PASSWORD = "1";
 
     // For connecting to the chalmers database server (from inside chalmers)
     // static final String DATABASE = "jdbc:postgresql://brage.ita.chalmers.se/";
@@ -37,14 +37,13 @@ public class PortalConnection {
 
     // Register a student on a course, returns a tiny JSON document (as a String)
     public String register(String student, String courseCode){
-      
-      // placeholder, remove along with this comment. 
-      return "{\"success\":false, \"error\":\"Registration is not implemented yet :(\"}";
-      
-      // Here's a bit of useful code, use it or delete it 
-      // } catch (SQLException e) {
-      //    return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
-      // }     
+        try {
+            conn.prepareStatement("INSERT INTO Registrations VALUES(" + student + "," + courseCode + ")");
+            return "{\"success\":true}";
+
+        }catch(SQLException e){
+            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
+        }
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
