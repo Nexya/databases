@@ -34,21 +34,30 @@ public class PortalConnection {
         conn = DriverManager.getConnection(db, props);
     }
 
+    private void executeSql(String sql) throws SQLException {
+        conn.prepareStatement(sql).execute();
+    }
 
     // Register a student on a course, returns a tiny JSON document (as a String)
     public String register(String student, String courseCode){
         try {
-            conn.prepareStatement("INSERT INTO Registrations VALUES(" + student + "," + courseCode + ")");
-            return "{\"success\":true}";
-
+            executeSql("INSERT INTO Registrations VALUES('" + student + "','" + courseCode + "');");
         }catch(SQLException e){
             return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
         }
+        return "{\"success\":true}";
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
     public String unregister(String student, String courseCode){
-      return "{\"success\":false, \"error\":\"Unregistration is not implemented yet :(\"}";
+        try {
+            executeSql("DELETE FROM Registrations" +
+                    "WHERE student = '" + student + "' and course = '" + courseCode + "';");
+        }catch(SQLException e){
+            return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
+
+        }
+      return "{\"success\":true}";
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
