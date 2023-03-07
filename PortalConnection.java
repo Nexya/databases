@@ -1,3 +1,4 @@
+import org.json.JSONObject;
 
 import java.sql.*; // JDBC stuff.
 import java.util.Properties;
@@ -10,7 +11,7 @@ public class PortalConnection {
     // For connecting to the portal database on your local machine
     static final String DATABASE = "jdbc:postgresql://localhost/"+DBNAME;
     static final String USERNAME = "postgres";
-    static final String PASSWORD = "1";
+    static final String PASSWORD = "postgres";
 
     // For connecting to the chalmers database server (from inside chalmers)
     // static final String DATABASE = "jdbc:postgresql://brage.ita.chalmers.se/";
@@ -62,22 +63,26 @@ public class PortalConnection {
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
     public String getInfo(String student) throws SQLException{
-        
+
+        JSONObject obj = new JSONObject();
+
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name) AS jsondata FROM BasicInformation WHERE idnr=?"
-            );){
+            "SELECT * FROM BasicInformation JOIN PathToGraduation on idnr=student WHERE idnr=?;"
+            )){
             
             st.setString(1, student);
             
             ResultSet rs = st.executeQuery();
             
-            if(rs.next())
-              return rs.getString("jsondata");
-            else
-              return "{\"student\":\"does not exist :(\"}"; 
-            
-        } 
+            if(rs.next()){
+                obj.put("student",rs.getString(1));
+                obj.put("name",rs.getString(3));
+                obj.put("login", rs.getString(2));
+                obj.put("program",rs.getString(4));
+            }
+        }
+        return obj.toString();
     }
 
     // This is a hack to turn an SQLException into a JSON string error message. No need to change.
