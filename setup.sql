@@ -1,4 +1,4 @@
-/*
+
 -- This script deletes everything in your database
 \set QUIET true
 SET client_min_messages TO WARNING; -- Less talk please.
@@ -6,7 +6,7 @@ SET client_min_messages TO WARNING; -- Less talk please.
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO CURRENT_USER;
-*/
+
 
 CREATE TABLE Departments(
     name        TEXT PRIMARY KEY,
@@ -349,3 +349,26 @@ LEFT JOIN (
     WHERE PassedCourses.course = RecommendedCourses.course 
     GROUP BY PassedCourses.student
 ) recommendedCredits ON Students.idnr = recommendedCredits.student;
+
+CREATE VIEW jsonFinished AS
+SELECT student, json_agg(
+    json_build_object(
+    'course',course,
+    'code',code,
+    'credits',credits,
+    'grade',grade))
+FROM (SELECT student, name AS course, course AS code, Courses.credits AS credits, grade
+FROM FinishedCourses JOIN Courses
+ON course = code) AS t GROUP BY student;
+
+CREATE VIEW jsonRegistered AS
+SELECT Registrations.student, json_agg(
+    json_build_object(
+    'course',course,
+    'status',status,
+    'position',position
+    )
+)
+FROM Registrations LEFT OUTER JOIN WaitingList
+ON Registrations.student = WaitingList.student
+AND course = limitedCourse GROUP BY Registrations.student;
