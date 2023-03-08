@@ -12,7 +12,7 @@ public class PortalConnection {
     // For connecting to the portal database on your local machine
     static final String DATABASE = "jdbc:postgresql://localhost/"+DBNAME;
     static final String USERNAME = "postgres";
-    static final String PASSWORD = "1";
+    static final String PASSWORD = "postgres";
 
     // For connecting to the chalmers database server (from inside chalmers)
     // static final String DATABASE = "jdbc:postgresql://brage.ita.chalmers.se/";
@@ -53,7 +53,7 @@ public class PortalConnection {
     // Unregister a student from a course, returns a tiny JSON document (as a String)
     public String unregister(String student, String courseCode){
         try {
-            executeSql("DELETE FROM Registrations" +
+            executeSql("DELETE FROM Registrations " +
                     "WHERE student = '" + student + "' and course = '" + courseCode + "';");
         }catch(SQLException e){
             return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
