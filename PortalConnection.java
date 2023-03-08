@@ -12,7 +12,7 @@ public class PortalConnection {
     // For connecting to the portal database on your local machine
     static final String DATABASE = "jdbc:postgresql://localhost/"+DBNAME;
     static final String USERNAME = "postgres";
-    static final String PASSWORD = "postgres";
+    static final String PASSWORD = "1";
 
     // For connecting to the chalmers database server (from inside chalmers)
     // static final String DATABASE = "jdbc:postgresql://brage.ita.chalmers.se/";
@@ -68,17 +68,29 @@ public class PortalConnection {
         JSONObject obj = new JSONObject();
 
         try(PreparedStatement st = conn.prepareStatement(
-            "SELECT * FROM BasicInformation JOIN PathToGraduation on idnr=student WHERE idnr=?;"
-            );){
+            "SELECT * FROM BasicInformation JOIN PathToGraduation on idnr=student WHERE idnr=?;");
+            PreparedStatement finished = conn.prepareStatement(
+                    "SELECT * FROM jsonFinished WHERE student = ?;");
+
+            PreparedStatement registered = conn.prepareStatement(
+                    "SELECT * FROM jsonRegistered WHERE student = ?;")
+
+        ){
             st.setString(1, student);
+            finished.setString(1,student);
+            registered.setString(1,student);
             ResultSet rs = st.executeQuery();
-            
-            if(rs.next()){
+            ResultSet fin = finished.executeQuery();
+            ResultSet reg = registered.executeQuery();
+
+            if(rs.next() && fin.next() && reg.next()){
                 obj.put("student",rs.getString(1));
-                obj.put("name",rs.getString(3));
-                obj.put("login", rs.getString(2));
+                obj.put("name",rs.getString(2));
+                obj.put("login", rs.getString(3));
                 obj.put("program",rs.getString(4));
                 obj.put("branch",rs.getString(5));
+                obj.put("finished",new JSONArray(fin.getString(2)));
+                obj.put("registered", new JSONArray(reg.getString(2)));
                 obj.put("seminarCourses", rs.getInt(11));
                 obj.put("mathCredits", rs.getDouble(9));
                 obj.put("researchCredits", rs.getDouble(10));
@@ -87,27 +99,6 @@ public class PortalConnection {
             }
             rs.close();
         }
-
-        try(PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM jsonFinished;"
-        );){
-            JSONArray arrobj = new JSONArray();
-            ResultSet rs = st.executeQuery();
-            if(rs.next()){
-                obj.getJSONArray(rs.getString(2));
-            }
-            rs.close();
-        }
-        try(PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM jsonRegistered;"
-        );){
-            ResultSet rs = st.executeQuery();
-            if(rs.next()){
-                obj.put("finished",rs.getString(2));
-            }
-            rs.close();
-        }
-
 
         return obj.toString();
     }
