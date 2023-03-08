@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.*; // JDBC stuff.
@@ -67,12 +68,9 @@ public class PortalConnection {
         JSONObject obj = new JSONObject();
 
         try(PreparedStatement st = conn.prepareStatement(
-            // replace this with something more useful
             "SELECT * FROM BasicInformation JOIN PathToGraduation on idnr=student WHERE idnr=?;"
-            )){
-            
+            );){
             st.setString(1, student);
-            
             ResultSet rs = st.executeQuery();
             
             if(rs.next()){
@@ -80,8 +78,37 @@ public class PortalConnection {
                 obj.put("name",rs.getString(3));
                 obj.put("login", rs.getString(2));
                 obj.put("program",rs.getString(4));
+                obj.put("branch",rs.getString(5));
+                obj.put("seminarCourses", rs.getInt(11));
+                obj.put("mathCredits", rs.getDouble(9));
+                obj.put("researchCredits", rs.getDouble(10));
+                obj.put("totalCredits", rs.getDouble(7));
+                obj.put("canGraduate", rs.getBoolean(12));
             }
+            rs.close();
         }
+
+        try(PreparedStatement st = conn.prepareStatement(
+                "SELECT * FROM jsonFinished;"
+        );){
+            JSONArray arrobj = new JSONArray();
+            ResultSet rs = st.executeQuery();
+            if(rs.next()){
+                obj.getJSONArray(rs.getString(2));
+            }
+            rs.close();
+        }
+        try(PreparedStatement st = conn.prepareStatement(
+                "SELECT * FROM jsonRegistered;"
+        );){
+            ResultSet rs = st.executeQuery();
+            if(rs.next()){
+                obj.put("finished",rs.getString(2));
+            }
+            rs.close();
+        }
+
+
         return obj.toString();
     }
 
