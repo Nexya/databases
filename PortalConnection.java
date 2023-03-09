@@ -36,30 +36,30 @@ public class PortalConnection {
         conn = DriverManager.getConnection(db, props);
     }
 
-    private void executeSql(String sql) throws SQLException {
-        conn.prepareStatement(sql).execute();
-    }
 
     // Register a student on a course, returns a tiny JSON document (as a String)
     public String register(String student, String courseCode){
-        try {
-            executeSql("INSERT INTO Registrations VALUES('" + student + "','" + courseCode + "');");
+        try (PreparedStatement registerStudent = conn.prepareStatement("INSERT INTO registrations VALUES (?, ?);")) {
+            registerStudent.setString(1, student);
+            registerStudent.setString(2, courseCode);
+            registerStudent.executeUpdate();
+            return "{\"success\": true}";
         }catch(SQLException e){
             return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
         }
-        return "{\"success\":true}";
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
     public String unregister(String student, String courseCode){
-        try {
-            executeSql("DELETE FROM Registrations " +
-                    "WHERE student = '" + student + "' and course = '" + courseCode + "';");
+        try (Statement unregisterStudent = conn.createStatement()){
+            if (unregisterStudent.executeUpdate(("DELETE FROM Registrations " +
+                    "WHERE student = '" + student + "' and course = '" + courseCode + "';")) == 0){
+                return "{\"success\": false, \"error\": \"Not registered for the course\"}";
+            }
+            return "{\"success\": true}";
         }catch(SQLException e){
             return "{\"success\":false, \"error\":\"" + getError(e) + "\"}";
-
         }
-      return "{\"success\":true}";
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json

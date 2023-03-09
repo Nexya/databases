@@ -8,20 +8,35 @@ public class TestPortal {
    public static void main(String[] args) {
       try{
          PortalConnection c = new PortalConnection();
-   
-         // Write your tests here. Add/remove calls to pause() as desired. 
-         // Use println instead of prettyPrint to get more compact output (if your raw JSON is already readable)
-   
-         //System.out.println(c.unregister("2222222222", "CCC333"));
-         //pause();
 
-         //prettyPrint(c.getInfo("2222222222"));
-         //pause();
+         // List info for a student.
+          prettyPrint(c.getInfo("2222222222"));
+          //pause();
 
-         //System.out.println(c.register("2222222222", "CCC111"));
-         //pause();
+          // Register a student for an unrestricted course, and check that he/she ends up registered (print info again).
+          System.out.println(c.register("2222222222", "CCC111"));
+          prettyPrint(c.getInfo("2222222222"));
+          //pause();
 
-         prettyPrint(c.getInfo("1111111111"));
+          // Register the same student for the same course again, and check that you get an error response.
+          System.out.println(c.register("2222222222", "CCC111"));
+          prettyPrint(c.getInfo("2222222222"));
+          //pause();
+
+
+          //TODO
+          // Unregister the student from the course, and then unregister him/her again from the same course.
+          // Check that the student is no longer registered and that the second unregistration gives an error response.
+          System.out.println(c.unregister("2222222222", "CCC111"));
+          prettyPrint(c.getInfo("2222222222"));
+          System.out.println(c.unregister("2222222222", "CCC111"));
+          pause();
+
+
+
+
+
+
 
 
 

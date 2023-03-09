@@ -1,6 +1,6 @@
 
 -- This script deletes everything in your database
-\set QUIET true
+\set QUIET false
 SET client_min_messages TO WARNING; -- Less talk please.
 -- This script deletes everything in your database
 DROP SCHEMA public CASCADE;

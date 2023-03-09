@@ -99,7 +99,7 @@ CREATE OR REPLACE FUNCTION unregister() RETURNS trigger AS $unregister$
             UPDATE WaitingList SET position = position - 1 WHERE limitedCourse = OLD.course;
         END IF;
 
-        RETURN NULL;
+        RETURN OLD;
     END;
 $unregister$ LANGUAGE 'plpgsql';
 
