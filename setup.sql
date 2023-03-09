@@ -362,13 +362,14 @@ FROM FinishedCourses JOIN Courses
 ON course = code) AS t GROUP BY student;
 
 CREATE VIEW jsonRegistered AS
-SELECT Registrations.student, json_agg(
+SELECT t.student, json_agg(
     json_build_object(
     'course',course,
+    'code',code,
     'status',status,
     'position',position
     )
 )
-FROM Registrations LEFT OUTER JOIN WaitingList
-ON Registrations.student = WaitingList.student
-AND course = limitedCourse GROUP BY Registrations.student;
+FROM (SELECT student, name AS course, code, status FROM Registrations JOIN Courses ON course = code) t LEFT OUTER JOIN WaitingList
+ON t.student = WaitingList.student
+AND t.code = limitedCourse GROUP BY t.student;
