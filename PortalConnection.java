@@ -83,19 +83,25 @@ public class PortalConnection {
             ResultSet fin = finished.executeQuery();
             ResultSet reg = registered.executeQuery();
 
-            if(rs.next() && fin.next() && reg.next()){
+            if(rs.next()){
                 obj.put("student",rs.getString(1));
                 obj.put("name",rs.getString(2));
                 obj.put("login", rs.getString(3));
                 obj.put("program",rs.getString(4));
                 obj.put("branch",rs.getString(5));
-                obj.put("finished",new JSONArray(fin.getString(2)));
-                obj.put("registered", new JSONArray(reg.getString(2)));
+                if(fin.next()){
+                    obj.put("finished",new JSONArray(fin.getString(2)));
+                }
+                if(reg.next()){
+                    obj.put("registered", new JSONArray(reg.getString(2)));
+                }
                 obj.put("seminarCourses", rs.getInt(11));
                 obj.put("mathCredits", rs.getDouble(9));
                 obj.put("researchCredits", rs.getDouble(10));
                 obj.put("totalCredits", rs.getDouble(7));
                 obj.put("canGraduate", rs.getBoolean(12));
+
+
             }
             rs.close();
         }
